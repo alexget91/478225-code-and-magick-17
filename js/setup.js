@@ -10,13 +10,13 @@ var WIZARDS_COUNT = 4;
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
 
-var setupPopup = document.querySelector('.setup');
+var setup = document.querySelector('.setup');
 var setupOpen = document.querySelector('.setup-open');
-var setupClose = setupPopup.querySelector('.setup-close');
-var setupUserName = setupPopup.querySelector('.setup-user-name');
-var wizardCoat = setupPopup.querySelector('.setup-wizard .wizard-coat');
-var wizardEyes = setupPopup.querySelector('.setup-wizard .wizard-eyes');
-var wizardFireball = setupPopup.querySelector('.setup-fireball-wrap');
+var setupClose = setup.querySelector('.setup-close');
+var setupUserName = setup.querySelector('.setup-user-name');
+var wizardCoat = setup.querySelector('.setup-wizard .wizard-coat');
+var wizardEyes = setup.querySelector('.setup-wizard .wizard-eyes');
+var wizardFireball = setup.querySelector('.setup-fireball-wrap');
 
 /* Генерация тестовых данных */
 var getRandomValue = function (arrData) {
@@ -66,14 +66,20 @@ var renderWizardsList = function () {
 };
 
 
+var setElementPosition = function (element, x, y) {
+  element.style.top = x ? x + 'px' : null;
+  element.style.left = y ? y + 'px' : null;
+};
+
 var showSetupPopup = function () {
-  setupPopup.classList.remove('hidden');
+  setup.classList.remove('hidden');
   document.addEventListener('keydown', onSetupEscPress);
 };
 
 var hideSetupPopup = function () {
-  setupPopup.classList.add('hidden');
+  setup.classList.add('hidden');
   document.removeEventListener('keydown', onSetupEscPress);
+  setElementPosition(setup);
 };
 
 var onSetupEscPress = function (evt) {
@@ -107,17 +113,17 @@ setupClose.addEventListener('keydown', function (evt) {
 });
 
 wizardCoat.addEventListener('click', function () {
-  setColor(wizardCoat, setupPopup.querySelector('input[name="coat-color"]'), getRandomValue(COAT_COLORS));
+  setColor(wizardCoat, setup.querySelector('input[name="coat-color"]'), getRandomValue(COAT_COLORS));
 });
 
 wizardEyes.addEventListener('click', function () {
-  setColor(wizardEyes, setupPopup.querySelector('input[name="eyes-color"]'), getRandomValue(EYE_COLORS));
+  setColor(wizardEyes, setup.querySelector('input[name="eyes-color"]'), getRandomValue(EYE_COLORS));
 });
 
 wizardFireball.addEventListener('click', function () {
   setColor(
       wizardFireball,
-      setupPopup.querySelector('input[name="fireball-color"]'),
+      setup.querySelector('input[name="fireball-color"]'),
       getRandomValue(FIREBALL_COLORS), true
   );
 });
@@ -126,3 +132,62 @@ var arrWizards = getWizardsData();
 
 document.querySelector('.setup-similar-list').appendChild(renderWizardsList());
 document.querySelector('.setup-similar').classList.remove('hidden');
+
+
+/* Перетаскивание */
+
+var setupDialogElement = document.querySelector('.setup');
+var dialogHandler = setupDialogElement.querySelector('.upload');
+
+dialogHandler.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  var dragged = false;
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+    dragged = true;
+
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    setElementPosition(
+        setupDialogElement,
+        setupDialogElement.offsetTop - shift.y,
+        setupDialogElement.offsetLeft - shift.x
+    );
+
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+
+    if (dragged) {
+      var onClickPreventDefault = function (clickEvt) {
+        clickEvt.preventDefault();
+        dialogHandler.removeEventListener('click', onClickPreventDefault);
+      };
+
+      dialogHandler.addEventListener('click', onClickPreventDefault);
+    }
+
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+});
