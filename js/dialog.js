@@ -94,4 +94,6 @@
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
+
+  window.dialog = {show: showSetupPopup, hide: hideSetupPopup};
 })();
