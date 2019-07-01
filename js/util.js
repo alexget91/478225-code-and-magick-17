@@ -10,10 +10,19 @@
         action();
       }
     },
+
     isEnterEvent: function (evt, action) {
       if (evt.keyCode === ENTER_KEYCODE) {
         action();
       }
+    },
+
+    compareRandom: function () {
+      return Math.random() - 0.5;
+    },
+
+    getRandomValue: function (arrData) {
+      return arrData[Math.floor(Math.random() * arrData.length)];
     }
   };
 })();
