@@ -17,10 +17,6 @@
       }
     },
 
-    compareRandom: function () {
-      return Math.random() - 0.5;
-    },
-
     getRandomValue: function (arrData) {
       return arrData[Math.floor(Math.random() * arrData.length)];
     }
